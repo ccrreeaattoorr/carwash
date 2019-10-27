@@ -40,3 +40,9 @@ if __name__ == "__main__":
     x1.start()
     x2 = threading.Thread(target=ct.thread_function)
     x2.start()
+
+    x1.join()
+    x2.join()
+
+    c1.disable_stepper()
+    c2.disable_stepper()

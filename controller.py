@@ -11,11 +11,6 @@ class Controller:
         self.is_stepper_enabled = False
         self.is_moving_now = False
 
-        # Variables
-        # self.delay = 0.0008
-        # self.steps = 0
-        # self.direction = "forward"
-
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
 
@@ -93,9 +88,6 @@ if __name__ == "__main__":
     parser.add_argument('--coil_A_2_pin', type=int, help='Input2')
     parser.add_argument('--coil_B_1_pin', type=int, help='Input3')
     parser.add_argument('--coil_B_2_pin', type=int, help='Input4')
-    # parser.add_argument('--delay', type=int, help='Delay', default=0.0008)
-    # parser.add_argument('--steps', type=int, help='Steps', default=1000)
-    # parser.add_argument('--direction', type=str, help='Direction', default="forward")
     args = parser.parse_args()
 
     c = Controller(args.enable_a, args.enable_b, args.coil_A_1_pin, args.coil_A_2_pin, args.coil_B_1_pin,
