@@ -49,8 +49,11 @@ class Controller:
 
     def move_stepper(self, steps, direction="forward", delay=0.0008):
         # loop through step sequence based on number of steps
+        print("steps {} direction: {} delay {}".format(steps, direction, delay))
+
         if self.is_stepper_enabled and not self.is_moving_now:
             self.is_moving_now = True
+            print("self.is_moving_now: {}".format(self.is_moving_now))
             if direction in "forward":
                 for i in range(0, steps):
                     self.set_step(1, 0, 1, 0)
@@ -75,9 +78,10 @@ class Controller:
 
     def disable_stepper(self):
         self.is_stepper_enabled = False
+        self.is_moving_now = False
         GPIO.output(self.enable_a, False)
         GPIO.output(self.enable_b, False)
-        print("is_stepper_enabled: {}".format(self.is_stepper_enabled))
+        print("is_stepper_enabled: {}, is_moving_now = {}".format(self.is_stepper_enabled, self.is_moving_now))
 
 
 if __name__ == "__main__":
