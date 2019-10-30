@@ -47,7 +47,7 @@ class Controller:
         GPIO.output(self.coil_B_1_pin, w3)
         GPIO.output(self.coil_B_2_pin, w4)
 
-    def move_stepper(self, steps, direction="forward", delay=0.0008):
+    def move_stepper(self, steps, direction="forward", delay=0.008):
         # loop through step sequence based on number of steps
         print("steps {} direction: {} delay {}".format(steps, direction, delay))
 
