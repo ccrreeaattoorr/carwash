@@ -1,6 +1,7 @@
 import time
 import argparse
 import itertools
+import threading
 import RPi.GPIO as GPIO
 #--enable_a 17 --enable_b 27 --coil_A_1_pin 18 --coil_A_2_pin 23 --coil_B_1_pin 24 --coil_B_2_pin 25 --direction backward
 
@@ -42,7 +43,7 @@ class Controller:
         GPIO.output(self.enable_b, True)
 
         self.is_stepper_enabled = True
-        print("{} stepper enabled: {}, moving now = {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+        print("id:{} stepper enabled: {}, moving now = {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
     # Function for step sequence
     def set_step(self, w1, w2, w3, w4):
@@ -51,13 +52,15 @@ class Controller:
         GPIO.output(self.coil_B_1_pin, w3)
         GPIO.output(self.coil_B_2_pin, w4)
 
-    def move_stepper(self, steps, direction="forward", delay=0.0008):
+    def non_blocking_move_stepper(self, steps, direction="forward", delay=0.0008):
         # loop through step sequence based on number of steps
-        print("{} steps {} direction: {} delay {}".format(self.id, steps, direction, delay))
+        print("id:{} steps {} direction: {} delay {}".format(self.id, steps, direction, delay))
 
+        self.enable_stepper()
         if self.is_stepper_enabled and not self.is_moving_now:
             self.is_moving_now = True
-            print("{} moving_now: {}".format(self.id, self.is_moving_now))
+            print("id:{} moving_now: {}".format(self.id, self.is_moving_now))
+
             if direction in "forward":
                 for i in range(0, steps):
                     self.set_step(1, 0, 1, 0)
@@ -79,13 +82,19 @@ class Controller:
                     self.set_step(1, 0, 1, 0)
                     time.sleep(delay)
         self.is_moving_now = False
+        print("id:{} moving_now: {}".format(self.id, self.is_moving_now))
+        self.disable_stepper()
+
+    def move_stepper(self, steps, direction="forward", delay=0.0008):
+        thread = threading.Thread(target=self.non_blocking_move_stepper, args=(steps, direction, delay))
+        thread.start()
 
     def disable_stepper(self):
         self.is_stepper_enabled = False
         self.is_moving_now = False
         GPIO.output(self.enable_a, False)
         GPIO.output(self.enable_b, False)
-        print("{} stepper enabled: {}, moving now = {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+        print("id:{} stepper enabled: {}, moving now = {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
 
 if __name__ == "__main__":
@@ -98,7 +107,7 @@ if __name__ == "__main__":
     parser.add_argument('--coil_B_2_pin', type=int, help='Input4')
     args = parser.parse_args()
 
-    c = Controller(args.enable_a, args.enable_b, args.coil_A_1_pin, args.coil_A_2_pin, args.coil_B_1_pin,
-                   args.coil_B_2_pin)
-    c.enable_stepper()
-    c.move_stepper(1000)
+    con = Controller(args.enable_a, args.enable_b, args.coil_A_1_pin, args.coil_A_2_pin, args.coil_B_1_pin,
+                     args.coil_B_2_pin)
+    con.enable_stepper()
+    con.move_stepper(1000)
