@@ -18,5 +18,5 @@ if __name__ == "__main__":
     c1 = Controller(13, 19, 12, 16, 20, 21)
     c2 = Controller(17, 27, 18, 23, 24, 25)
 
-    c1.move_stepper(steps=args.steps, direction=args.direction, speed=args.speed)
-    c2.move_stepper(steps=args.steps, direction=args.direction, speed=args.speed)
+    c1.non_blocking_move_stepper(steps=args.steps, direction=args.direction, speed=args.speed)
+    c2.non_blocking_move_stepper(steps=args.steps, direction=args.direction, speed=args.speed)

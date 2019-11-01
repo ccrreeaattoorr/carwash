@@ -3,10 +3,9 @@ import time
 import logging
 import argparse
 import itertools
-import constants
 import threading
 import RPi.GPIO as GPIO
-consts = constants.Constants()
+from constants import Speed
 
 
 class Controller:
@@ -16,9 +15,6 @@ class Controller:
     def __init__(self, enable_a, enable_b, coil_a_1_pin, coil_a_2_pin, coil_b_1_pin, coil_b_2_pin):
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S')
-
-        consts = constants.Constants()
-        logging.info(consts.MAX_SPEED)
 
         self.id = next(self.id_iter)
         self.is_stepper_enabled = False
@@ -55,19 +51,22 @@ class Controller:
             "id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
     # Function for step sequence
-    def set_step(self, w1, w2, w3, w4):
+    def __set_step(self, w1, w2, w3, w4, speed):
         # logging.INFO('id: {} w1: {} w2: {} w3: {} w4: {}'.format(self.id, w1, w2, w3, w4))
         GPIO.output(self.coil_A_1_pin, w1)
         GPIO.output(self.coil_A_2_pin, w2)
         GPIO.output(self.coil_B_1_pin, w3)
         GPIO.output(self.coil_B_2_pin, w4)
+        time.sleep(speed)
 
-    def non_blocking_move_stepper(self, steps, direction="forward", speed=consts.MAX_SPEED):
+    def __move_stepper(self, steps, direction="forward", speed=Speed.MAX_SPEED):
         # loop through step sequence based on number of steps
         logging.info("id:{} steps: {} direction: {} speed: {}".format(self.id, steps, direction, speed))
 
         if 'MAX_SPEED' in speed:
-            speed = consts.MAX_SPEED
+            speed = Speed.MAX_SPEED
+        elif 'MIN_SPEED' in speed:
+            speed = Speed.MIN_SPEED
 
         self.enable_stepper()
         if self.is_stepper_enabled and not self.is_moving_now:
@@ -76,30 +75,23 @@ class Controller:
 
             if direction in "forward":
                 for i in range(0, steps):
-                    self.set_step(1, 0, 1, 0)
-                    time.sleep(speed)
-                    self.set_step(0, 1, 1, 0)
-                    time.sleep(speed)
-                    self.set_step(0, 1, 0, 1)
-                    time.sleep(speed)
-                    self.set_step(1, 0, 0, 1)
-                    time.sleep(speed)
+                    self.__set_step(1, 0, 1, 0, speed)
+                    self.__set_step(0, 1, 1, 0, speed)
+                    self.__set_step(0, 1, 0, 1, speed)
+                    self.__set_step(1, 0, 0, 1, speed)
             elif direction in "backward":
                 for i in range(0, steps):
-                    self.set_step(1, 0, 0, 1)
-                    time.sleep(speed)
-                    self.set_step(0, 1, 0, 1)
-                    time.sleep(speed)
-                    self.set_step(0, 1, 1, 0)
-                    time.sleep(speed)
-                    self.set_step(1, 0, 1, 0)
-                    time.sleep(speed)
+                    self.__set_step(1, 0, 0, 1, speed)
+                    self.__set_step(0, 1, 0, 1, speed)
+                    self.__set_step(0, 1, 1, 0, speed)
+                    self.__set_step(1, 0, 1, 0, speed)
+
         self.is_moving_now = False
         logging.info("id:{} moving_now: {}".format(self.id, self.is_moving_now))
         self.disable_stepper()
 
-    def move_stepper(self, steps, direction="forward", speed=consts.MAX_SPEED):
-        thread = threading.Thread(target=self.non_blocking_move_stepper, args=(steps, direction, speed))
+    def non_blocking_move_stepper(self, steps, direction="forward", speed=Speed.MAX_SPEED):
+        thread = threading.Thread(target=self.__move_stepper, args=(steps, direction, speed))
         thread.start()
 
     def disable_stepper(self):
@@ -124,4 +116,4 @@ if __name__ == "__main__":
     con = Controller(args.enable_a, args.enable_b, args.coil_A_1_pin, args.coil_A_2_pin, args.coil_B_1_pin,
                      args.coil_B_2_pin)
     con.enable_stepper()
-    con.move_stepper(1000)
+    con.non_blocking_move_stepper(1000)
