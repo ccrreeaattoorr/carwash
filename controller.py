@@ -6,7 +6,7 @@ import itertools
 import constants
 import threading
 import RPi.GPIO as GPIO
-consts = constants.Constants(variable='AN_ENVIRONMENT_VARIABLE', filename='constants.cfg')
+consts = constants.Constants()
 
 
 class Controller:
@@ -16,6 +16,9 @@ class Controller:
     def __init__(self, enable_a, enable_b, coil_a_1_pin, coil_a_2_pin, coil_b_1_pin, coil_b_2_pin):
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S')
+
+        consts = constants.Constants()
+        logging.info(consts.MAX_SPEED)
 
         self.id = next(self.id_iter)
         self.is_stepper_enabled = False
@@ -62,6 +65,10 @@ class Controller:
     def non_blocking_move_stepper(self, steps, direction="forward", speed=consts.MAX_SPEED):
         # loop through step sequence based on number of steps
         logging.info("id:{} steps: {} direction: {} speed: {}".format(self.id, steps, direction, speed))
+
+        if 'MAX_SPEED' in speed:
+            speed = consts.MAX_SPEED
+
         self.enable_stepper()
         if self.is_stepper_enabled and not self.is_moving_now:
             self.is_moving_now = True
