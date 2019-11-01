@@ -1,27 +1,25 @@
-import argparse
 import sys
 import time
 import logging
+import argparse
 import threading
 from subprocess import check_call
 
 
 class ControllerThread:
 
-    def __init__(self, _c1, _c2):
-        self.c1 = _c1
-        self.c2 = _c2
+    def __init__(self, **kwargs):
+        self.controllers = kwargs
 
     def thread_function(self):
-        print("thread")
-        self.c1.move_stepper(1000)
-        self.c2.move_stepper(1000, direction="backward")
+        for c in self.controllers:
+            self.controllers[c].move_stepper(1000)
 
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--mock', type=bool, help='Mock controller')
+    parser = argparse.ArgumentParser(description='Controller administration Args')
+    parser.add_argument('--mock', type=bool, default=False, help='Mock controller')
     args = parser.parse_args()
 
     if args.mock:
@@ -34,15 +32,12 @@ if __name__ == "__main__":
     c1.enable_stepper()
     c2.enable_stepper()
 
-    ct = ControllerThread(c1, c2)
+    controllers = {"c1": c1, "c2": c2}
+    ct = ControllerThread(**controllers)
 
     x1 = threading.Thread(target=ct.thread_function)
     x1.start()
-    x2 = threading.Thread(target=ct.thread_function)
-    x2.start()
-
     x1.join()
-    x2.join()
 
     c1.disable_stepper()
     c2.disable_stepper()
