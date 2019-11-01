@@ -1,9 +1,4 @@
-import sys
-import time
-import logging
 import argparse
-import threading
-from subprocess import check_call
 
 
 if __name__ == "__main__":
