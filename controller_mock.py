@@ -27,21 +27,20 @@ class Controller:
 
     def enable_stepper(self):
         self.is_stepper_enabled = True
-        print("id:{} stepper enabled: {}, moving now = {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+        print("id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
     # Function for step sequence
     def set_step(self, w1, w2, w3, w4):
-        # print("{} {} {} {}".format(w1, w2, w3, w4))
         time.sleep(0.1)
-        pass
 
     def non_blocking_move_stepper(self, steps, direction="forward", delay=0.0008):
         # loop through step sequence based on number of steps
-        print("id:{} steps {} direction: {} delay {}".format(self.id, steps, direction, delay))
+        print("id:{} steps: {} direction: {} delay: {}".format(self.id, steps, direction, delay))
 
+        self.enable_stepper()
         if self.is_stepper_enabled and not self.is_moving_now:
             self.is_moving_now = True
-            print("id:{} moving_now: {}".format(self.id, self.is_moving_now))
+            print("id:{} moving now: {}".format(self.id, self.is_moving_now))
 
             if direction in "forward":
                 for i in range(0, steps):
@@ -65,6 +64,7 @@ class Controller:
                     time.sleep(delay)
         self.is_moving_now = False
         print("id:{} moving_now: {}".format(self.id, self.is_moving_now))
+        self.disable_stepper()
 
     def move_stepper(self, steps, direction="forward", delay=0.0008):
         thread = threading.Thread(target=self.non_blocking_move_stepper, args=(steps, direction, delay))
@@ -73,7 +73,7 @@ class Controller:
     def disable_stepper(self):
         self.is_stepper_enabled = False
         self.is_moving_now = False
-        print("id:{} stepper enabled: {}, moving now = {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+        print("id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
 
 if __name__ == "__main__":

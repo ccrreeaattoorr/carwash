@@ -1,18 +1,23 @@
+import sys
 import time
+import logging
 import argparse
 import itertools
 import threading
 import RPi.GPIO as GPIO
-#--enable_a 17 --enable_b 27 --coil_A_1_pin 18 --coil_A_2_pin 23 --coil_B_1_pin 24 --coil_B_2_pin 25 --direction backward
 
 
 class Controller:
 
     id_iter = itertools.count()
+    MAX_SPEED = 0.001
+    MIN_SPEED = 0.09
 
     def __init__(self, enable_a, enable_b, coil_a_1_pin, coil_a_2_pin, coil_b_1_pin, coil_b_2_pin):
-        self.id = next(self.id_iter)
+        logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',
+                            datefmt='%Y-%m-%d %H:%M:%S')
 
+        self.id = next(self.id_iter)
         self.is_stepper_enabled = False
         self.is_moving_now = False
 
@@ -43,50 +48,52 @@ class Controller:
         GPIO.output(self.enable_b, True)
 
         self.is_stepper_enabled = True
-        print("id:{} stepper enabled: {}, moving now = {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+        logging.info(
+            "id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
     # Function for step sequence
     def set_step(self, w1, w2, w3, w4):
+        # logging.INFO('id: {} w1: {} w2: {} w3: {} w4: {}'.format(self.id, w1, w2, w3, w4))
         GPIO.output(self.coil_A_1_pin, w1)
         GPIO.output(self.coil_A_2_pin, w2)
         GPIO.output(self.coil_B_1_pin, w3)
         GPIO.output(self.coil_B_2_pin, w4)
 
-    def non_blocking_move_stepper(self, steps, direction="forward", delay=0.0008):
+    def non_blocking_move_stepper(self, steps, direction="forward", speed=MAX_SPEED):
         # loop through step sequence based on number of steps
-        print("id:{} steps {} direction: {} delay {}".format(self.id, steps, direction, delay))
+        logging.info("id:{} steps: {} direction: {} speed: {}".format(self.id, steps, direction, speed))
 
         self.enable_stepper()
         if self.is_stepper_enabled and not self.is_moving_now:
             self.is_moving_now = True
-            print("id:{} moving_now: {}".format(self.id, self.is_moving_now))
+            logging.info("id:{} moving now: {}".format(self.id, self.is_moving_now))
 
             if direction in "forward":
                 for i in range(0, steps):
                     self.set_step(1, 0, 1, 0)
-                    time.sleep(delay)
+                    time.sleep(speed)
                     self.set_step(0, 1, 1, 0)
-                    time.sleep(delay)
+                    time.sleep(speed)
                     self.set_step(0, 1, 0, 1)
-                    time.sleep(delay)
+                    time.sleep(speed)
                     self.set_step(1, 0, 0, 1)
-                    time.sleep(delay)
+                    time.sleep(speed)
             elif direction in "backward":
                 for i in range(0, steps):
                     self.set_step(1, 0, 0, 1)
-                    time.sleep(delay)
+                    time.sleep(speed)
                     self.set_step(0, 1, 0, 1)
-                    time.sleep(delay)
+                    time.sleep(speed)
                     self.set_step(0, 1, 1, 0)
-                    time.sleep(delay)
+                    time.sleep(speed)
                     self.set_step(1, 0, 1, 0)
-                    time.sleep(delay)
+                    time.sleep(speed)
         self.is_moving_now = False
-        print("id:{} moving_now: {}".format(self.id, self.is_moving_now))
+        logging.info("id:{} moving_now: {}".format(self.id, self.is_moving_now))
         self.disable_stepper()
 
-    def move_stepper(self, steps, direction="forward", delay=0.0008):
-        thread = threading.Thread(target=self.non_blocking_move_stepper, args=(steps, direction, delay))
+    def move_stepper(self, steps, direction="forward", speed=MAX_SPEED):
+        thread = threading.Thread(target=self.non_blocking_move_stepper, args=(steps, direction, speed))
         thread.start()
 
     def disable_stepper(self):
@@ -94,7 +101,7 @@ class Controller:
         self.is_moving_now = False
         GPIO.output(self.enable_a, False)
         GPIO.output(self.enable_b, False)
-        print("id:{} stepper enabled: {}, moving now = {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+        logging.info("id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
 
 if __name__ == "__main__":
