@@ -3,15 +3,15 @@ import time
 import logging
 import argparse
 import itertools
+import constants
 import threading
 import RPi.GPIO as GPIO
+consts = constants.Constants(variable='AN_ENVIRONMENT_VARIABLE', filename='constants.cfg')
 
 
 class Controller:
 
     id_iter = itertools.count()
-    MAX_SPEED = 0.001
-    MIN_SPEED = 0.09
 
     def __init__(self, enable_a, enable_b, coil_a_1_pin, coil_a_2_pin, coil_b_1_pin, coil_b_2_pin):
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',
@@ -59,10 +59,9 @@ class Controller:
         GPIO.output(self.coil_B_1_pin, w3)
         GPIO.output(self.coil_B_2_pin, w4)
 
-    def non_blocking_move_stepper(self, steps, direction="forward", speed=MAX_SPEED):
+    def non_blocking_move_stepper(self, steps, direction="forward", speed=consts.MAX_SPEED):
         # loop through step sequence based on number of steps
         logging.info("id:{} steps: {} direction: {} speed: {}".format(self.id, steps, direction, speed))
-
         self.enable_stepper()
         if self.is_stepper_enabled and not self.is_moving_now:
             self.is_moving_now = True
@@ -92,7 +91,7 @@ class Controller:
         logging.info("id:{} moving_now: {}".format(self.id, self.is_moving_now))
         self.disable_stepper()
 
-    def move_stepper(self, steps, direction="forward", speed=MAX_SPEED):
+    def move_stepper(self, steps, direction="forward", speed=consts.MAX_SPEED):
         thread = threading.Thread(target=self.non_blocking_move_stepper, args=(steps, direction, speed))
         thread.start()
 
@@ -101,7 +100,8 @@ class Controller:
         self.is_moving_now = False
         GPIO.output(self.enable_a, False)
         GPIO.output(self.enable_b, False)
-        logging.info("id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+        logging.info(
+            "id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
 
 if __name__ == "__main__":
