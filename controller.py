@@ -12,10 +12,11 @@ class Controller:
 
     id_iter = itertools.count()
 
-    def __init__(self, enable_a, enable_b, coil_a_1_pin, coil_a_2_pin, coil_b_1_pin, coil_b_2_pin):
+    def __init__(self, enable_a, enable_b, coil_a_1_pin, coil_a_2_pin, coil_b_1_pin, coil_b_2_pin, name="c"):
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S')
 
+        self.name = name
         self.id = next(self.id_iter)
         self.is_stepper_enabled = False
         self.is_moving_now = False
@@ -34,6 +35,8 @@ class Controller:
         self.coil_B_2_pin = coil_b_2_pin
 
     def enable_stepper(self):
+        if self.is_stepper_enabled:
+            return
         # Set pin states
         GPIO.setup(self.enable_a, GPIO.OUT)
         GPIO.setup(self.enable_b, GPIO.OUT)
@@ -48,7 +51,8 @@ class Controller:
 
         self.is_stepper_enabled = True
         logging.info(
-            "id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+            "name: {} id: {} stepper enabled: {} moving now: {}".format(self.name, self.id, self.is_stepper_enabled,
+                                                                        self.is_moving_now))
 
     # Function for step sequence
     def __set_step(self, w1, w2, w3, w4, speed):
@@ -59,9 +63,9 @@ class Controller:
         GPIO.output(self.coil_B_2_pin, w4)
         time.sleep(speed)
 
-    def __move_stepper(self, steps, direction="forward", speed=Speed.MAX_SPEED):
+    def __move_stepper(self, steps, direction="forward", speed='MAX_SPEED'):
         # loop through step sequence based on number of steps
-        logging.info("id:{} steps: {} direction: {} speed: {}".format(self.id, steps, direction, speed))
+        logging.info("id: {} steps: {} direction: {} speed: {}".format(self.id, steps, direction, speed))
 
         if 'MAX_SPEED' in speed:
             speed = Speed.MAX_SPEED
@@ -69,38 +73,42 @@ class Controller:
             speed = Speed.MIN_SPEED
 
         self.enable_stepper()
-        if self.is_stepper_enabled and not self.is_moving_now:
+        if not self.is_moving_now:
             self.is_moving_now = True
-            logging.info("id:{} moving now: {}".format(self.id, self.is_moving_now))
+            logging.info("id: {} moving now: {}".format(self.id, self.is_moving_now))
 
-            if direction in "forward":
-                for i in range(0, steps):
-                    self.__set_step(1, 0, 1, 0, speed)
-                    self.__set_step(0, 1, 1, 0, speed)
-                    self.__set_step(0, 1, 0, 1, speed)
-                    self.__set_step(1, 0, 0, 1, speed)
-            elif direction in "backward":
-                for i in range(0, steps):
-                    self.__set_step(1, 0, 0, 1, speed)
-                    self.__set_step(0, 1, 0, 1, speed)
-                    self.__set_step(0, 1, 1, 0, speed)
-                    self.__set_step(1, 0, 1, 0, speed)
+            try:
+                if direction in "forward":
+                    for i in range(0, steps):
+                        self.__set_step(1, 0, 1, 0, speed)
+                        self.__set_step(0, 1, 1, 0, speed)
+                        self.__set_step(0, 1, 0, 1, speed)
+                        self.__set_step(1, 0, 0, 1, speed)
+                elif direction in "backward":
+                    for i in range(0, steps):
+                        self.__set_step(1, 0, 0, 1, speed)
+                        self.__set_step(0, 1, 0, 1, speed)
+                        self.__set_step(0, 1, 1, 0, speed)
+                        self.__set_step(1, 0, 1, 0, speed)
+            except Exception as ex:
+                logging.info("id: {} Exception occurred {}".format(self.id, ex))
+                logging.info("Trying to disable and stop stepper motor")
+            finally:
+                self.disable_stepper()
 
-        self.is_moving_now = False
-        logging.info("id:{} moving_now: {}".format(self.id, self.is_moving_now))
-        self.disable_stepper()
-
-    def non_blocking_move_stepper(self, steps, direction="forward", speed=Speed.MAX_SPEED):
+    def non_blocking_move_stepper(self, steps, direction="forward", speed="MAX_SPEED"):
         thread = threading.Thread(target=self.__move_stepper, args=(steps, direction, speed))
         thread.start()
 
     def disable_stepper(self):
-        self.is_stepper_enabled = False
-        self.is_moving_now = False
+        if not self.is_stepper_enabled:
+            return
         GPIO.output(self.enable_a, False)
         GPIO.output(self.enable_b, False)
+        self.is_stepper_enabled = False
+        self.is_moving_now = False
         logging.info(
-            "id:{} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
+            "id: {} stepper enabled: {} moving now: {}".format(self.id, self.is_stepper_enabled, self.is_moving_now))
 
 
 if __name__ == "__main__":

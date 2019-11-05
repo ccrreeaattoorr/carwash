@@ -1,0 +1,53 @@
+{
+   "Frames": {
+      "frame1": {
+         "id": "rsp1",
+         "controllers": {
+            "c1": {
+               "ena": 13,
+               "enb": 19,
+               "a1": 12,
+               "a2": 16,
+               "b1": 20,
+               "b2": 21
+            },
+            "c2": {
+               "ena": 17,
+               "enb": 27,
+               "a1": 18,
+               "a2": 23,
+               "b1": 24,
+               "b2": 25
+            }
+         },
+         "instructions": {
+            "move1": {
+               "c1": {
+                  "direction": "forward",
+                  "steps": 400,
+                  "speed": "MAX_SPEED"
+               },
+               "c2": {
+                  "direction": "backward",
+                  "steps": 600,
+                  "speed": "MAX_SPEED"
+               }
+            },
+            "move2": {
+               "c1": {
+                  "direction": "backward",
+                  "steps": 200,
+                  "speed": "MAX_SPEED"
+               }
+            },
+            "move3": {
+               "c2": {
+                  "direction": "forward",
+                  "steps": 200,
+                  "speed": "MAX_SPEED"
+               }
+            }
+         }
+      }
+   }
+}

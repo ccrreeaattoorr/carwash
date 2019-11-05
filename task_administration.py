@@ -1,4 +1,27 @@
 import argparse
+import time
+
+
+class TaskAdministration:
+
+    def __init__(self, controllers, instructions):
+        self.controllers = controllers
+        self.instructions = instructions
+        pass
+
+    def execute_tasks(self):
+        for instruction in self.instructions:
+            for controller in self.instructions[instruction]:
+                c = self.instructions[instruction][controller]
+                self.controllers[controller].non_blocking_move_stepper(c["steps"], c["direction"], c["speed"])
+            task_finished = False
+            while not task_finished:
+                time.sleep(0.5)
+                for controller in self.controllers:
+                    if self.controllers[controller].is_moving_now:
+                        task_finished = False
+                        break
+                    task_finished = True
 
 
 if __name__ == "__main__":
