@@ -2,7 +2,7 @@ import sys
 import json
 import logging
 import argparse
-from controller_mock import Controller
+from controller import Controller
 from urllib3.connectionpool import xrange
 from task_administration import TaskAdministration
 

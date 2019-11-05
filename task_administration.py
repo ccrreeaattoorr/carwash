@@ -1,5 +1,5 @@
-import argparse
 import time
+import argparse
 
 
 class TaskAdministration:
