@@ -8,7 +8,7 @@ __pycache__/
 
 # Pycharm
 .idea/
-
+testing
 # Distribution / packaging
 .Python
 build/
