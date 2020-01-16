@@ -6,5 +6,4 @@ logging
 urllib3
 argparse
 itertools
-itertools
 threading

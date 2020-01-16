@@ -36,7 +36,7 @@ if __name__ == "__main__":
     if args.mock:
         from controller_mock import Controller
     else:
-        from controller import Controller
+        from controller_L298N import Controller
 
     c1 = Controller(13, 19, 12, 16, 20, 21)
     c2 = Controller(17, 27, 18, 23, 24, 25)
