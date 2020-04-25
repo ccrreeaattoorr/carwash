@@ -2,7 +2,7 @@ import threading
 from time import sleep
 #import RPi.GPIO as GPIO
 from roboclaw_3 import Roboclaw
-from python_console_menu import AbstractMenu, MenuItem
+from pynput.keyboard import Key, Listener
 
 
 class MecanumRobot:
@@ -16,8 +16,8 @@ class MecanumRobot:
         self.sleep_time = 0.005
         self.roboclaw = Roboclaw("/dev/ttyS0", 38400)
         self.roboclaw.Open()
-        print("Error")
-        print(self.roboclaw.ReadError(self.address_front_wheels))
+        # print("Errors:")
+        # print(self.roboclaw.ReadError(self.address_front_wheels))
         self.roboclaw.SetMinVoltageMainBattery(self.address_front_wheels, 62)
         self.roboclaw.SetMaxVoltageMainBattery(self.address_front_wheels, 112)
 
@@ -85,43 +85,45 @@ class MecanumRobot:
         sleep(self.sleep_time)
 
 
-class MecanumRobotMenu(AbstractMenu):
+key_pressed = False
+m = MecanumRobot()
 
-    def __init__(self):
-        super().__init__("Welcome to the mecanum robot menu.")
-        self.m = MecanumRobot()
 
-    def initialise(self):
-        self.add_menu_item(MenuItem(0, "Exit menu").set_as_exit_option())
-        self.add_menu_item(MenuItem(1, "Stop", lambda: [print("Stop"), self.m.stop()]))
-        self.add_menu_item(MenuItem(2, "Forward",
-                                    lambda: [print("move forward"),
-                                             self.m.move_forward(),
-                                             print("moving")
-                                             ]))
-        self.add_menu_item(MenuItem(3, "Backward",
-                                    lambda: [print("move backward"),
-                                             self.m.move_backward(),
-                                             print("moving")
-                                             ]))
-        self.add_menu_item(MenuItem(4, "Left",
-                                    lambda: [print("move left"),
-                                             self.m.slide_left(),
-                                             print("moving")
-                                             ]))
-        self.add_menu_item(MenuItem(5, "Right",
-                                    lambda: [print("move right"),
-                                             self.m.slide_right(),
-                                             print("moving")
-                                             ]))
-        self.add_menu_item(MenuItem(6, "Rotate Right",
-                                    lambda: [print("rotate right"),
-                                             self.m.rotate_left(),
-                                             print("moving")
-                                             ]))
+def on_press(key):
+    global key_pressed
+    # print("key pressed: {}".format(key_pressed))
+    if not key_pressed:
+        key_pressed = True
+        print('{0} pressed'.format(key))
+        if hasattr(key, 'char'):
+            if 'w' == key.char:
+                print("w - forward")
+                m.move_forward()
+            if 'a' == key.char:
+                print("a - left")
+                m.slide_left()
+            if 'd' == key.char:
+                print("d - right")
+                m.slide_right()
+            if 's' == key.char:
+                print("s - backward")
+                m.move_backward()
+
+
+def on_release(key):
+    global key_pressed
+    key_pressed = False
+    print('{0} release'.format(
+        key))
+    if key == Key.esc:
+        # Stop listener
+        return False
 
 
 if __name__ == "__main__":
-    demoMenu = MecanumRobotMenu()
-    demoMenu.display()
 
+    # Collect events until released
+    with Listener(
+            on_press=on_press,
+            on_release=on_release) as listener:
+        listener.join()

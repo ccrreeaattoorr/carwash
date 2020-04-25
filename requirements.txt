@@ -2,8 +2,10 @@ RPi
 sys
 time
 json
+pynput
 logging
 urllib3
 argparse
+keyboard
 itertools
 threading
