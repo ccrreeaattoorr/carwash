@@ -1,6 +1,6 @@
 import threading
 from time import sleep
-#import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 from roboclaw_3 import Roboclaw
 from pynput.keyboard import Key, Listener
 
@@ -10,19 +10,31 @@ class MecanumRobot:
     def __init__(self):
         # GPIO.setmode(GPIO.BCM)
         # GPIO.setwarnings(False)
+        print("Init MecanumRobot started")
         self.address_front_wheels = 0x80
         self.address_rear_wheels = 0x81
         self.full_speed = 127
         self.sleep_time = 0.005
         self.roboclaw = Roboclaw("/dev/ttyS0", 38400)
         self.roboclaw.Open()
-        # print("Errors:")
-        # print(self.roboclaw.ReadError(self.address_front_wheels))
-        self.roboclaw.SetMinVoltageMainBattery(self.address_front_wheels, 62)
-        self.roboclaw.SetMaxVoltageMainBattery(self.address_front_wheels, 112)
+        print("-----------------Errors-----------------")
+        print("-----------------Front wheels-----------------")
+        print(self.roboclaw.ReadError(self.address_front_wheels))
+        print("-----------------Rear wheels-----------------")
+        print(self.roboclaw.ReadError(self.address_rear_wheels))
+        print("-----------------Errors-----------------")
+        self.roboclaw.SetMinVoltageMainBattery(self.address_front_wheels, 60)
+        self.roboclaw.SetMaxVoltageMainBattery(self.address_front_wheels, 150)
 
-        self.roboclaw.SetMinVoltageMainBattery(self.address_rear_wheels, 62)
-        self.roboclaw.SetMaxVoltageMainBattery(self.address_rear_wheels, 112)
+        self.roboclaw.SetMinVoltageMainBattery(self.address_rear_wheels, 60)
+        self.roboclaw.SetMaxVoltageMainBattery(self.address_rear_wheels, 150)
+        print("-----------------Errors-----------------")
+        print("-----------------Front wheels-----------------")
+        print(self.roboclaw.ReadError(self.address_front_wheels))
+        print("-----------------Rear wheels-----------------")
+        print(self.roboclaw.ReadError(self.address_rear_wheels))
+        print("-----------------Errors-----------------")
+        print("Init MecanumRobot finished")
 
     def move_backward(self):
         threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_front_wheels, self.full_speed)).start()
@@ -113,6 +125,7 @@ def on_press(key):
 def on_release(key):
     global key_pressed
     key_pressed = False
+    m.stop()
     print('{0} release'.format(
         key))
     if key == Key.esc:
@@ -123,7 +136,5 @@ def on_release(key):
 if __name__ == "__main__":
 
     # Collect events until released
-    with Listener(
-            on_press=on_press,
-            on_release=on_release) as listener:
+    with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
         listener.join()
