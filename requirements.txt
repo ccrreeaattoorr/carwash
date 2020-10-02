@@ -2,10 +2,13 @@ RPi
 sys
 time
 json
+numpy
 pynput
 logging
+vpython
 urllib3
 argparse
 keyboard
 itertools
 threading
+paho-mqtt

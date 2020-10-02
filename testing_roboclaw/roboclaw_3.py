@@ -3,6 +3,7 @@ import serial
 import struct
 import time
 
+
 class Roboclaw:
 	'Roboclaw Interface Class'
 	
@@ -663,7 +664,11 @@ class Roboclaw:
 		return self._write1(address,self.Cmd.SETMAXMB,val)
 
 	def ForwardM2(self,address,val):
-		return self._write1(address,self.Cmd.M2FORWARD,val)
+		time_before = time.time()
+		status = self._write1(address, self.Cmd.M2FORWARD, val)
+		delta = time.time() - time_before
+		print("{} ticks to run ForwardM2".format(delta))
+		return status
 
 	def BackwardM2(self,address,val):
 		return self._write1(address,self.Cmd.M2BACKWARD,val)
