@@ -69,13 +69,17 @@ class MecanumRobot:
         self.lock.acquire()
         try:
             if self.pre_check(direction=MecanumRobotDirection.backward):
-                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_front_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_front_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_rear_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_rear_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time_long)
         finally:
             self.lock.release()
@@ -86,13 +90,17 @@ class MecanumRobot:
         self.lock.acquire()
         try:
             if self.pre_check(direction=MecanumRobotDirection.forward):
-                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_front_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_front_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_rear_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_rear_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time_long)
         finally:
             self.lock.release()
@@ -103,13 +111,17 @@ class MecanumRobot:
         self.lock.acquire()
         try:
             if self.pre_check(direction=MecanumRobotDirection.slide_right):
-                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_front_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_front_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_rear_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_rear_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time_long)
         finally:
             self.lock.release()
@@ -120,13 +132,17 @@ class MecanumRobot:
         self.lock.acquire()
         try:
             if self.pre_check(direction=MecanumRobotDirection.slide_left):
-                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_front_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_front_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_rear_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_rear_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time_long)
         finally:
             self.lock.release()
@@ -137,13 +153,17 @@ class MecanumRobot:
         self.lock.acquire()
         try:
             if self.pre_check(direction=MecanumRobotDirection.rotate_right):
-                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_front_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_front_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM1, args=(self.address_rear_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM2, args=(self.address_rear_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time_long)
         finally:
             self.lock.release()
@@ -154,13 +174,17 @@ class MecanumRobot:
         self.lock.acquire()
         try:
             if self.pre_check(direction=MecanumRobotDirection.rotate_left):
-                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_front_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_front_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_front_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.ForwardM1, args=(self.address_rear_wheels,
+                                                                       self.full_speed)).start()
                 sleep(self.sleep_time)
-                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_rear_wheels, self.full_speed)).start()
+                threading.Thread(target=self.roboclaw.BackwardM2, args=(self.address_rear_wheels,
+                                                                        self.full_speed)).start()
                 sleep(self.sleep_time_long)
         finally:
             self.lock.release()
